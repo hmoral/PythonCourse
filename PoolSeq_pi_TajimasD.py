@@ -64,7 +64,7 @@ freq_file.readline()
 print freq_file
 #Pi_output = open("Pi_windows.txt", "w")
 #Pi_output.write()
-#sys.stdout.write("contig" + "\t" + "win.start" + "\t" + "win.end" + "\t" + "win.len" + "\t" + "freq" + "\t"+ "pi"+ "\t" + "TajD"+ "\t" + "missing_data" + "\t" + "win_depth" +"\n" )
+sys.stdout.write("contig" + "\t" + "win.start" + "\t" + "win.end" + "\t" + "win.len" + "\t" + "freq" + "\t"+ "pi"+ "\t" + "TajD"+ "\t" + "missing_data" + "\t" + "win_depth" +"\n" )
 
 pi_list = []
 tajD_list = []
@@ -74,7 +74,7 @@ positions = []
 pos = 0
 
 for line in freq_file:
-    print(line)
+    #print(line)
 #firstLine = freq_file.readline()
     position = line.split()[1]
     #print position
@@ -97,7 +97,7 @@ for line in freq_file:
         	continue
 
         site_pi = 2 * freq_Alt * (1-freq_Alt) * (float(sys.argv[2])/(float(sys.argv[2]) - 1))  #Tajima 1989
-        print("PASS QUAL: "+ str(qual) + " Contig= " + str(contig) + " Pos= " + str(position) + " Pi = " + str(site_pi))
+        #print("PASS QUAL: "+ str(qual) + " Contig= " + str(contig) + " Pos= " + str(position) + " Pi = " + str(site_pi))
         site_depth = float(depth)  #depth reference plus depth alt in IA and CP respectively.
         freq_list.append(freq_Alt) #enter the value into the list
         pi_list.append(site_pi)     #enter the value into the list, including zeros
@@ -115,12 +115,12 @@ for line in freq_file:
         window_lenght = float(window_end-window_start)
         window_freq = float(sum(freq_list))/len(freq_list)  #window avg alt allele freq equals avg of all incl. fixed sites
         window_pi = float(sum(pi_list))/len(pi_list)  #window pi is equal to average of site pi across all sites in window, including invariant ones
-        print("#####    Window: contig = " + str(contig) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####")
+        #print("#####    Window: contig = " + str(contig) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####")
         missing_data = (window_end - window_start) - len(pi_list)
         window_tajD = 0
         window_depth = float(sum(depth_list))/len(depth_list)
         
-        #sys.stdout.write(str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth))
+        sys.stdout.write(str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
 
         pi_list = []
         tajD_list = []
@@ -136,14 +136,14 @@ if pos > 1:
 	window_lenght = float(window_end-window_start)
 	window_freq = float(sum(freq_list))/len(freq_list)  #window avg alt allele freq equals avg of all incl. fixed sites
 	window_pi = float(sum(pi_list))/len(pi_list)  #window pi is equal to average of site pi across all sites in window, including invariant ones
-	print "Last window"
-	print("#####    Window: contig = " + str(contig) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####")
+	#print "Last window"
+	#print("#####    Window: contig = " + str(contig) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####")
 	window_tajD = 0
 	missing_data = (window_end - window_start) - len(pi_list)
 	window_depth = float(sum(depth_list))/len(depth_list)
 
     
-    #sys.stdout.write(str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth))
+	sys.stdout.write(str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
 
 freq_file.close()
 #print( "Completed pi windows for scaffold " + str(scaff) +"\t" )
