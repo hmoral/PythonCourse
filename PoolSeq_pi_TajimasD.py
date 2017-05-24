@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ##### TODO
 '''
-1) Separate per contig
+1) Separate per contig, do it by listing samples
 2) Automatic process to identify sample name and do count per sample ([pops])
 3) write output table
 4) Add SNP filter to ignore MSP and indels
