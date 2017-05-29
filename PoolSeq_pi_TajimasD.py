@@ -1,16 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+
+
+#### Notes
+'''
+1) REMEBER TO START WITH AND INDEL-ONLY! TABLE
+'''
+
+
 ##### TODO
 '''
-1) Separate per contig, do it by listing samples
-2) Automatic process to identify sample name and do count per sample ([pops])
-3) write output table
-4) Add SNP filter to ignore MSP and indels
-5) Figure out how monomorphic positions are terated
-6) expected allele frequencies need to be 0 for invariant reference sites
+1) ADD comments
 '''
 import sys
 
+
+##### Description
 '''
 This scripts take a single allelic frequency table and calculates pi and Tajima's D for sliding widows
 
