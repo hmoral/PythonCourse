@@ -16,7 +16,7 @@ This scripts take a single allelic frequency table and calculates pi and Tajima'
 
 '''
 
-print '''
+'''
 This scripts take a single allelic frequency table and calculates pi and Tajima's D for sliding widows
 Usage: PoolSeq_pi_TajimasD.py infile [pops] nPOOL. Writes to StdOut
 infile = allelic frequency table (see example below)
@@ -66,26 +66,24 @@ Contig10	39101	C	NA	.	160.002	NA	160.002	1	NA	1	1	NA	P2202_103_1to4
 
 freq_file = open(sys.argv[1], "r")
 freq_file.readline()
-print freq_file
+#print freq_file
 #Pi_output = open("Pi_windows.txt", "w")
 #Pi_output.write()
-#sys.stdout.write("sample" + "\t" + "contig" + "\t" + "win.start" + "\t" + "win.end" + "\t" + "win.len" + "\t" + "freq" + "\t"+ "pi"+ "\t" + "TajD"+ "\t" + "missing_data" + "\t" + "win_depth" +"\n" )
+sys.stdout.write("sample" + "\t" + "contig" + "\t" + "win.start" + "\t" + "win.end" + "\t" + "win.len" + "\t" + "freq" + "\t"+ "pi"+ "\t" + "TajD"+ "\t" + "missing_data" + "\t" + "win_depth" +"\n" )
 
 pi_list = []
-tajD_list = []
 freq_list = []
 depth_list=[]
 positions = []
-last_contig = None
+last_contig = []
 pos = 0
 
 for line in freq_file:
-
 	#sample=line.split()[13] 
 	#if  sample == sys.argv[2]:
 	#	continue
 	#else:
-    #print(line)
+	#print(line)
 #firstLine = freq_file.readline()
     position = line.split()[1]
     #print position
@@ -109,61 +107,84 @@ for line in freq_file:
         	continue
 
         site_pi = 2 * freq_Alt * (1-freq_Alt) * (float(sys.argv[2])/(float(sys.argv[2]) - 1))  #Tajima 1989
-        print("PASS QUAL: "+ str(qual) + " sample=" + str(sample_name) + " Contig= " + str(contig) + " Pos= " + str(position) + " Pi = " + str(site_pi))
+        #print("PASS QUAL: "+ str(qual) + " sample=" + str(sample_name) + " Contig= " + str(contig) + " Pos= " + str(position) + " Pi = " + str(site_pi))
         site_depth = float(depth)  #depth reference plus depth alt in IA and CP respectively.
         freq_list.append(freq_Alt) #enter the value into the list
         pi_list.append(site_pi)     #enter the value into the list, including zeros
         depth_list.append(depth)
+        last_contig.append(str(contig))
 
         positions.append(position)
         
-        if last_contig is None:
-        	last_contig = contig
-
         if qual > 20 or 100 < depth > 4:
         	pos += 1
-        	#print("Contigs: current = " + contig + "pos count: " + str(pos))
+        	#print("Contigs: current = " + contig + " last = " + last_contig[0] + last_contig[-1] + " pos count: " + str(pos))
             
-    if pos == 100 or contig != last_contig:     #Every 100 snps, calculate end position of window and avg. pi for window
-        contig = line.split()[0]
+    if pos == 100 and str(last_contig[0]) == str(last_contig[-1]):     #Every 100 snps, calculate end position of window and avg. pi for window
+        contig = last_contig[0]
         window_start = float(positions[0])
         window_end = float(positions[-1])
         window_lenght = float(window_end-window_start)
         window_freq = float(sum(freq_list))/len(freq_list)  #window avg alt allele freq equals avg of all incl. fixed sites
         window_pi = float(sum(pi_list))/len(pi_list)  #window pi is equal to average of site pi across all sites in window, including invariant ones
-        print("Lenght pi list " + str(len(pi_list)))
-        print("##############    Window: contig = " + str(last_contig) + " sample=" + str(sample_name) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####################")
-        missing_data = (window_end - window_start) - len(pi_list)
+        #print("Lenght pi list " + str(len(pi_list)))
+        #print last_contig
+        #print("##############    Window: contig = " + str(contig) + " sample=" + str(sample_name) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####################")
+        missing_data = window_lenght - len(pi_list) + 1
         window_tajD = 0
         window_depth = float(sum(depth_list))/len(depth_list)
         last_contig = contig
         
-        #sys.stdout.write(str(sample_name) + "\t" + str(last_contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
+        sys.stdout.write(str(sample_name) + "\t" + str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
 
         pi_list = []
-        tajD_list = []
         freq_list = []
         depth_list=[]
         positions = []
+        last_contig = []
+        pos = 0
+     
+    elif str(last_contig[0]) != str(last_contig[-1]):     #Every 100 snps, calculate end position of window and avg. pi for window
+        contig = last_contig[0]
+        window_start = float(positions[0])
+        window_end = float(positions[-2])
+        window_lenght = float(window_end-window_start)
+        window_freq = float(sum(freq_list[0:-1]))/len(freq_list[0:-1])  #window avg alt allele freq equals avg of all incl. fixed sites
+        window_pi = float(sum(pi_list[0:-1]))/len(pi_list[0:-1])  #window pi is equal to average of site pi across all sites in window, including invariant ones
+        #print("Lenght pi list " + str(len(pi_list)))
+        #print last_contig
+        #print("####################  LAST  Window: contig = " + str(contig) + " sample=" + str(sample_name) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "    #####################")
+        missing_data = window_lenght - len(pi_list[0:-1]) + 1
+        window_tajD = 0
+        window_depth = float(sum(depth_list[0:-1]))/len(depth_list[0:-1])
+        last_contig = contig
+        
+        sys.stdout.write(str(sample_name) + "\t" + str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
+
+        pi_list = [pi_list[-1]]
+        freq_list = [freq_list[-1]]
+        depth_list=[depth_list[-1]]
+        positions = [positions[-1]]
+        last_contig = []
         pos = 0
         
 #get the last window
 if pos > 1:
-	contig = line.split()[0]
+	contig = last_contig[0]
 	window_start = float(positions[0])
 	window_end = float(positions[-1])
 	window_lenght = float(window_end-window_start)
 	window_freq = float(sum(freq_list))/len(freq_list)  #window avg alt allele freq equals avg of all incl. fixed sites
 	window_pi = float(sum(pi_list))/len(pi_list)  #window pi is equal to average of site pi across all sites in window, including invariant ones
-	print "Last window"
-	print("Lenght pi list " + str(len(pi_list)))
-	print("##############     Window: contig = " + str(contig) +" sample=" + str(sample_name) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "   ############## ")
+	#print "Last window"
+	#print("Lenght pi list " + str(len(pi_list)))
+	#print("##############     Window: contig = " + str(contig) +" sample=" + str(sample_name) + " start=" + str(window_start) + " end=" + str(window_end) + " len=" + str(window_lenght) + " Pi = " + str(window_pi) + "   ############## ")
 	window_tajD = 0
 	missing_data = (window_end - window_start) - len(pi_list)
 	window_depth = float(sum(depth_list))/len(depth_list)
 
     
-	#sys.stdout.write(str(sample_name) + "\t" +  str(last_contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
+	sys.stdout.write(str(sample_name) + "\t" +  str(contig) + "\t" + str(window_start) + "\t" + str(window_end) + "\t" + str(window_lenght) + "\t" + str(window_freq) + "\t" + str(window_pi) + "\t" + str(window_tajD) + "\t" + str(missing_data) + "\t" + str(window_depth) + "\n")
 
 freq_file.close()
 #print( "Completed pi windows for scaffold " + str(scaff) +"\t" )
