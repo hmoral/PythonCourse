@@ -11,7 +11,8 @@
 
 ##### TODO
 '''
-1) ADD comments
+1) ADD positions count and SNP density to output table
+2) ADD upper depth limit
 '''
 import sys
 
